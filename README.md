@@ -1,3 +1,5 @@
+# CURRENT PROGRESS IS BEING MADE ON A PRIVATE REPO
+
 # Navigation Assistant
 
 This project is aimed at providing a real time navigation assistant for the visually impaired which is currently being built to be able to detect sidewalks, crosswalks, and traffic light in a solution that will be combined with Google Maps navigation to provide a solution for visually impaired.
