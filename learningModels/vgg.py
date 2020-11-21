@@ -69,14 +69,14 @@ class vgg:
         # print(classification_report(y_test, y_pred.argmax(axis=1)))
 
     def save(self):
-        self.model.save("../data/models/models" + str(int(time.time())) + ".h5")
+        self.model.save("../data/models" + str(int(time.time())) + ".h5")
 
     def load(self, model_time):
-        list_of_files = glob.glob('../data/models/model*')
+        list_of_files = glob.glob('data/*')
         print(list_of_files)
 
         try:
-            file_name = list_of_files[list_of_files.index("../data/models/models" + model_time + ".h5")]
+            file_name = list_of_files[list_of_files.index("data/models" + model_time + ".h5")]
         except ValueError:
             print(ValueError)
             list_of_files.sort()

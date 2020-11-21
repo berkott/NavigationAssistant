@@ -1,60 +1,49 @@
 import csv
 import glob
+import os
 import time
 
 import cv2
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report,accuracy_score
+import pickle
 import pandas as pd
 import numpy as np
 
 
 class svm:
-    def __init__(self, c, gamma):
-        self.svm = cv2.ml.SVM_create()
-        self.svm.setType(cv2.ml.SVM_C_SVC)
-        self.svm.setKernel(cv2.ml.SVM_RBF)
-        self.svm.setC(c)
-        self.svm.setGamma(gamma)
+    def __init__(self):
+        self.model = SVC(decision_function_shape='ovo')
 
     def train(self, x_train, y_train):
-        self.svm.train  (x_train, cv2.ml.ROW_SAMPLE, y_train)
-    #
-    # def evaluate(self, x_test, y_test):
-    #     loss_and_metrics = self.model.evaluate(x_test, y_test, batch_size=self.BATCH_SIZE)
-    #
-    #     print("mse, accuracy:", loss_and_metrics)
-    #
-    #     with open('performance.csv', mode='a') as per_file:
-    #         per_writer = csv.writer(per_file, delimiter=',')
-    #
-    #         per_writer.writerow(['cnn',
-    #                              self.EPOCHS,
-    #                              self.BATCH_SIZE,
-    #                              int(time.time()),
-    #                              loss_and_metrics[0],
-    #                              loss_and_metrics[1]])
-    #
-    #     y_pred = self.model.predict(x_test)
-    #
-    #     print("Y Test:", y_test)
-    #     print("Y Pred:", y_pred)
-    #     # print(confusion_matrix(y_test, y_pred.argmax(axis=1)))
-    #     # print(classification_report(y_test, y_pred.argmax(axis=1)))
+        print("training")
+        self.model.fit(x_train, y_train)
 
     def save(self):
-        self.svm.save("../data/models/svm" + str(int(time.time())) + ".dat")
+        filename = 'data/' + str(int(time.time())) + '.sav'
+        pickle.dump(self.model, open(filename, 'wb'))
+        # self.model.save("../../data/models/svm" + str(int(time.time())) + ".dat")
 
     def load(self, model_time):
-        list_of_files = glob.glob('../data/models/svm*')
+        list_of_files = glob.glob('data/*sav')
         print(list_of_files)
+        latest_file = max(list_of_files, key=os.path.getctime)
+        # file_name = None
+        #
+        # if not model_time == 0:
+        #     file_name = list_of_files[list_of_files.index("../../data/models/svm" + str(model_time) + ".sav")]
+        # else:
+        #     list_of_files.sort()
+        #     file_name = list_of_files[len(list_of_files) - 1]
 
-        try:
-            file_name = list_of_files[list_of_files.index("../data/models/svm" + model_time + ".dat")]
-        except ValueError:
-            print(ValueError)
-            list_of_files.sort()
-            file_name = list_of_files[len(list_of_files) - 1]
-
-        self.svm = cv2.ml.SVM_load(file_name)
+        self.model = pickle.load(open(latest_file, 'rb'))
+        print("loaded")
 
     def predict(self, data):
-        return self.svm.predict(data)
+        return self.model.predict(data)
+
+    def evaluate(self, x, y):
+        y_pred = self.model.predict(x)
+        print("Accuracy: " + str(accuracy_score(y, y_pred)))
+        print('\n')
+        print(classification_report(y, y_pred))
